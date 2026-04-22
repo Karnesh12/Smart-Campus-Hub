@@ -10,6 +10,8 @@ import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
+import org.springframework.beans.factory.annotation.Value;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -18,6 +20,9 @@ import java.util.Optional;
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     private final UserRepository userRepository;
+
+    @Value("${app.auth.admin-emails:}")
+    private List<String> adminEmails;
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest oAuth2UserRequest) throws OAuth2AuthenticationException {
@@ -58,13 +63,17 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             user = userRepository.save(user);
         } else {
             // Register new user
+            User.Role assignedRole = adminEmails != null && adminEmails.contains(email) 
+                ? User.Role.ADMIN 
+                : User.Role.STUDENT;
+
             user = User.builder()
                     .name(name)
                     .email(email)
                     .provider(provider)
                     .providerId(providerId)
                     .avatarUrl(avatarUrl)
-                    .role(User.Role.STUDENT) // Default role
+                    .role(assignedRole)
                     .build();
             user = userRepository.save(user);
         }
