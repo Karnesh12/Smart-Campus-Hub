@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import axios from 'axios';
+import api from '../services/api';
 
 export default function OAuth2RedirectHandler() {
   const [searchParams] = useSearchParams();
@@ -14,12 +14,11 @@ export default function OAuth2RedirectHandler() {
     const urlError = searchParams.get('error');
 
     if (token) {
-      // Save token and configure Axios
+      // Save token
       localStorage.setItem('jwt_token', token);
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
       // Fetch user profile from the backend
-      axios.get('/api/auth/me')
+      api.get('/auth/me')
         .then(response => {
           login(response.data);
           navigate('/dashboard', { replace: true });
@@ -29,7 +28,6 @@ export default function OAuth2RedirectHandler() {
           setError('Failed to fetch user profile. Please try logging in again.');
           // Clean up token just in case
           localStorage.removeItem('jwt_token');
-          delete axios.defaults.headers.common['Authorization'];
           
           setTimeout(() => {
             navigate('/login', { replace: true });
