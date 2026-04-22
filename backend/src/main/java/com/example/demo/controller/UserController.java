@@ -5,6 +5,10 @@ import com.example.demo.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import com.example.demo.security.UserPrincipal;
+import com.example.demo.exception.ResourceNotFoundException;
+import com.example.demo.security.TokenProvider;
 import java.util.Map;
 import java.util.Optional;
 
@@ -15,6 +19,7 @@ import java.util.Optional;
 public class UserController {
 
     private final UserRepository userRepository;
+    private final TokenProvider tokenProvider;
 
     // Simple login: match by email (no password needed for student project)
     @PostMapping("/login")
@@ -29,7 +34,9 @@ public class UserController {
             return ResponseEntity.status(401).body(Map.of("message", "No account found with that email"));
         }
 
-        return ResponseEntity.ok(userOpt.get());
+        User user = userOpt.get();
+        String token = tokenProvider.createToken(UserPrincipal.create(user));
+        return ResponseEntity.ok(Map.of("token", token, "user", user));
     }
 
     // Login with email + name (auto-register if not found)
@@ -54,11 +61,22 @@ public class UserController {
                 return userRepository.save(newUser);
             });
 
-        return ResponseEntity.ok(user);
+        String token = tokenProvider.createToken(UserPrincipal.create(user));
+        return ResponseEntity.ok(Map.of("token", token, "user", user));
     }
 
     @GetMapping("/users")
     public ResponseEntity<?> getAllUsers() {
         return ResponseEntity.ok(userRepository.findAll());
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<?> getCurrentUser(@AuthenticationPrincipal UserPrincipal userPrincipal) {
+        if (userPrincipal == null) {
+            return ResponseEntity.status(401).body(Map.of("message", "User not authenticated"));
+        }
+        User user = userRepository.findById(userPrincipal.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userPrincipal.getId()));
+        return ResponseEntity.ok(user);
     }
 }
