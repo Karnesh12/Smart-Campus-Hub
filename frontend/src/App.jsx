@@ -5,8 +5,9 @@ import LoginPage from './pages/LoginPage'
 import OAuth2RedirectHandler from './pages/OAuth2RedirectHandler'
 import Navbar from './components/Navbar'
 import ResourcesPage from './pages/ResourcesPage'
+import { Toaster } from 'react-hot-toast'
 
-// ✅ Layout with Navbar
+//  Layout with Navbar
 function AppLayout() {
   const { user } = useAuth()
 
@@ -29,6 +30,7 @@ function AppLayout() {
 function App() {
   return (
     <AuthProvider>
+      <Toaster position="top-right" />
       <Router>
         <Routes>
 

@@ -1,5 +1,4 @@
 import React, { createContext, useState, useEffect, useContext } from 'react'
-import axios from 'axios'
 
 const AuthContext = createContext(null)
 
@@ -16,13 +15,6 @@ export function AuthProvider({ children }) {
     }
   })
 
-  useEffect(() => {
-    const token = localStorage.getItem('jwt_token');
-    if (token) {
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-    }
-  }, []);
-
   const login = (userData) => {
     localStorage.setItem(SESSION_KEY, JSON.stringify(userData))
     setUser(userData)
@@ -31,7 +23,6 @@ export function AuthProvider({ children }) {
   const logout = () => {
     localStorage.removeItem(SESSION_KEY)
     localStorage.removeItem('jwt_token')
-    delete axios.defaults.headers.common['Authorization']
     setUser(null)
   }
 
