@@ -24,6 +24,9 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     @Value("${app.auth.admin-emails:}")
     private List<String> adminEmails;
 
+    @Value("${app.auth.staff-emails:}")
+    private List<String> staffEmails;
+
     @Override
     public OAuth2User loadUser(OAuth2UserRequest oAuth2UserRequest) throws OAuth2AuthenticationException {
         OAuth2User oAuth2User = super.loadUser(oAuth2UserRequest);
@@ -63,9 +66,14 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             user = userRepository.save(user);
         } else {
             // Register new user
-            User.Role assignedRole = adminEmails != null && adminEmails.contains(email) 
-                ? User.Role.ADMIN 
-                : User.Role.STUDENT;
+            User.Role assignedRole;
+            if (adminEmails != null && adminEmails.contains(email)) {
+                assignedRole = User.Role.ADMIN;
+            } else if (staffEmails != null && staffEmails.contains(email)) {
+                assignedRole = User.Role.STAFF;
+            } else {
+                assignedRole = User.Role.STUDENT;
+            }
 
             user = User.builder()
                     .name(name)
