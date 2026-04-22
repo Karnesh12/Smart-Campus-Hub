@@ -38,6 +38,12 @@ public class Resource {
     @Builder.Default
     private ResourceStatus status = ResourceStatus.AVAILABLE;
 
+    @Column(name = "occupied_from")
+    private LocalDateTime occupiedFrom;
+
+    @Column(name = "occupied_until")
+    private LocalDateTime occupiedUntil;
+
     @Column(columnDefinition = "TEXT")
     private String description;
 

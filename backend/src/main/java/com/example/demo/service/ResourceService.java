@@ -49,6 +49,8 @@ public class ResourceService {
         existing.setLocation(updatedResource.getLocation());
         existing.setCapacity(updatedResource.getCapacity());
         existing.setStatus(updatedResource.getStatus());
+        existing.setOccupiedFrom(updatedResource.getOccupiedFrom());
+        existing.setOccupiedUntil(updatedResource.getOccupiedUntil());
         existing.setDescription(updatedResource.getDescription());
         return resourceRepository.save(existing);
     }

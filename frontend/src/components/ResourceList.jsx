@@ -1,5 +1,5 @@
 import React from 'react'
-import { Building2, MapPin, Users, Pencil, Trash2, Landmark, Laptop, Dumbbell, BookOpen, Mic } from 'lucide-react'
+import { Building2, MapPin, Users, Pencil, Trash2, Landmark, Laptop, Dumbbell, BookOpen, Mic, Clock } from 'lucide-react'
 
 
 const statusBadge = {
@@ -48,6 +48,16 @@ export default function ResourceList({ resources, onEdit, onDelete, canManage })
                             <div><MapPin size={11} /> {r.location}</div>
                             <div><Users size={11} /> Capacity: {r.capacity}</div>
                         </div>
+                        {r.status === 'OCCUPIED' && r.occupiedFrom && r.occupiedUntil && (
+                            <div className="resource-card-meta" style={{ marginTop: 4, color: '#b45309', fontWeight: 500 }}>
+                                <div>
+                                    <Clock size={11} /> 
+                                    {new Date(r.occupiedFrom).toLocaleString([], {month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'})} 
+                                    {' - '} 
+                                    {new Date(r.occupiedUntil).toLocaleString([], {month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'})}
+                                </div>
+                            </div>
+                        )}
                         {r.description && (
                             <p style={{ fontSize: 12, color: 'var(--text-3)', marginTop: 8, lineHeight: 1.5 }}>
                                 {r.description.length > 80 ? r.description.slice(0, 80) + '…' : r.description}

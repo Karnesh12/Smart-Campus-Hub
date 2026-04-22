@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import toast from 'react-hot-toast'
 
 const TYPES = ['LECTURE_HALL', 'LAB', 'MEETING_ROOM', 'SPORTS', 'STUDY_ROOM', 'AUDITORIUM', 'OTHER']
 const STATUSES = ['AVAILABLE', 'OCCUPIED', 'MAINTENANCE', 'RETIRED']
@@ -7,14 +8,41 @@ export default function ResourceForm({ initial, onSubmit, onCancel }) {
     const [form, setForm] = useState({
         name: '', type: 'LECTURE_HALL', location: '',
         capacity: 10, status: 'AVAILABLE', description: '',
+        occupiedFrom: '', occupiedUntil: '',
         ...initial,
     })
+
+    const [minDateTime, setMinDateTime] = useState('')
+    
+    useEffect(() => {
+        const now = new Date()
+        now.setMinutes(now.getMinutes() - now.getTimezoneOffset())
+        setMinDateTime(now.toISOString().slice(0, 16))
+    }, [])
 
     const set = (k, v) => setForm(f => ({ ...f, [k]: v }))
 
     const handleSubmit = (e) => {
         e.preventDefault()
-        onSubmit({ ...form, capacity: Number(form.capacity) })
+
+        if (form.status === 'OCCUPIED') {
+            if (new Date(form.occupiedUntil) <= new Date(form.occupiedFrom)) {
+                toast.error('Occupied Until time must be after Occupied From time')
+                return
+            }
+            
+            if (!initial && new Date(form.occupiedFrom) < new Date()) {
+                toast.error('Occupied From time cannot be in the past')
+                return
+            }
+        }
+
+        const submitData = { ...form, capacity: Number(form.capacity) }
+        if (submitData.status !== 'OCCUPIED') {
+            submitData.occupiedFrom = null
+            submitData.occupiedUntil = null
+        }
+        onSubmit(submitData)
     }
 
     return (
@@ -47,6 +75,24 @@ export default function ResourceForm({ initial, onSubmit, onCancel }) {
                         {STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
                     </select>
                 </div>
+                {form.status === 'OCCUPIED' && (
+                    <>
+                        <div className="form-group">
+                            <label>Occupied From *</label>
+                            <input className="form-control" type="datetime-local" required 
+                                min={initial?.occupiedFrom ? undefined : minDateTime} 
+                                value={form.occupiedFrom || ''} 
+                                onChange={e => set('occupiedFrom', e.target.value)} />
+                        </div>
+                        <div className="form-group">
+                            <label>Occupied Until *</label>
+                            <input className="form-control" type="datetime-local" required 
+                                min={form.occupiedFrom || minDateTime} 
+                                value={form.occupiedUntil || ''} 
+                                onChange={e => set('occupiedUntil', e.target.value)} />
+                        </div>
+                    </>
+                )}
             </div>
             <div className="form-group">
                 <label>Description</label>
