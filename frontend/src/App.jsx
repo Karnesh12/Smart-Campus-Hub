@@ -6,13 +6,19 @@ import OAuth2RedirectHandler from './pages/OAuth2RedirectHandler'
 import Navbar from './components/Navbar'
 import ResourcesPage from './pages/ResourcesPage'
 import BookingsPage from './pages/BookingsPage'
+
+// Member 3 — Incident Tickets
+import TicketListPage from './pages/incidents/TicketListPage'
+import CreateTicketPage from './pages/incidents/CreateTicketPage'
+import TicketDetailPage from './pages/incidents/TicketDetailPage'
+
 import { Toaster } from 'react-hot-toast'
 
-//  Layout with Navbar
+// ── Protected Layout ─────────────────────────────────────
 function AppLayout() {
   const { user } = useAuth()
 
-  // protect routes
+  // Protect all routes inside this layout
   if (!user) return <Navigate to="/login" replace />
 
   return (
@@ -20,8 +26,24 @@ function AppLayout() {
       <Navbar />
       <div className="main-content">
         <Routes>
+          {/* Existing routes */}
           <Route path="/resources" element={<ResourcesPage />} />
           <Route path="/bookings" element={<BookingsPage />} />
+
+          {/* Dashboard */}
+          <Route path="/dashboard" element={
+            <div style={{ padding: '40px', textAlign: 'center' }}>
+              <h1>Dashboard</h1>
+              <p>Welcome to Smart Campus!</p>
+            </div>
+          } />
+
+          {/* Tickets (merged) */}
+          <Route path="/tickets" element={<TicketListPage />} />
+          <Route path="/tickets/create" element={<CreateTicketPage />} />
+          <Route path="/tickets/:id" element={<TicketDetailPage />} />
+
+          {/* Default fallback */}
           <Route path="*" element={<Navigate to="/resources" replace />} />
         </Routes>
       </div>
@@ -29,7 +51,7 @@ function AppLayout() {
   )
 }
 
-// Main App
+// ── Main App ─────────────────────────────────────────────
 function App() {
   return (
     <AuthProvider>
@@ -38,10 +60,11 @@ function App() {
         <Routes>
 
           {/* Public */}
+          <Route path="/" element={<Navigate to="/login" replace />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/oauth2/redirect" element={<OAuth2RedirectHandler />} />
 
-          {/* Protected (with Navbar) */}
+          {/* Protected */}
           <Route path="/*" element={<AppLayout />} />
 
         </Routes>

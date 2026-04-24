@@ -5,8 +5,12 @@ import com.example.demo.dto.TicketResponseDTO;
 import com.example.demo.dto.TicketStatusUpdateDTO;
 import com.example.demo.model.Ticket;
 import com.example.demo.model.TicketAttachment;
+import com.example.demo.model.User;
 import com.example.demo.repository.TicketAttachmentRepository;
+import com.example.demo.repository.TicketCommentRepository;
 import com.example.demo.repository.TicketRepository;
+import com.example.demo.repository.UserRepository;
+import com.example.demo.security.UserPrincipal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
@@ -30,16 +34,19 @@ public class TicketService {
 
     private final TicketRepository ticketRepository;
     private final TicketAttachmentRepository attachmentRepository;
+    private final TicketCommentRepository commentRepository;
+    private final UserRepository userRepository;
 
     @Value("${file.upload-dir:uploads/tickets}")
     private String uploadDir;
 
     // ── CREATE ────────────────────────────────────────────────────────────────
-    public TicketResponseDTO createTicket(TicketRequestDTO dto, List<MultipartFile> files) throws IOException {
-
-        if (files != null && files.size() > 3) {
-            throw new IllegalArgumentException("Maximum 3 image attachments allowed");
-        }
+    public TicketResponseDTO createTicket(TicketRequestDTO dto,
+                                          UserPrincipal userPrincipal) throws IOException {
+        // Get real user from JWT token via UserPrincipal
+        User user = userRepository.findById(userPrincipal.getId())
+                .orElseThrow(() -> new RuntimeException(
+                        "User not found with id: " + userPrincipal.getId()));
 
         Ticket ticket = Ticket.builder()
                 .title(dto.getTitle())
@@ -49,33 +56,27 @@ public class TicketService {
                 .status(Ticket.TicketStatus.OPEN)
                 .resourceLocation(dto.getResourceLocation())
                 .resourceId(dto.getResourceId())
-                .reportedByUserId("testuser")
-                .reportedByEmail("testuser@test.com")
+                .reportedByUserId(String.valueOf(user.getId()))
+                .reportedByEmail(user.getEmail())
                 .preferredContact(dto.getPreferredContact())
                 .build();
 
         Ticket saved = ticketRepository.save(ticket);
-
-        if (files != null) {
-            for (MultipartFile file : files) {
-                if (!file.isEmpty()) {
-                    saveAttachment(saved, file);
-                }
-            }
-        }
-
-        return toResponseDTO(ticketRepository.findById(saved.getId()).orElse(saved));
+        return toResponseDTO(saved);
     }
 
-    // ── ADD ATTACHMENTS TO EXISTING TICKET ───────────────────────────────────
-    public TicketResponseDTO addAttachments(Long ticketId, List<MultipartFile> files) throws IOException {
+    // ── ADD ATTACHMENTS ───────────────────────────────────────────────────────
+    public TicketResponseDTO addAttachments(Long ticketId,
+                                            List<MultipartFile> files) throws IOException {
         Ticket ticket = ticketRepository.findById(ticketId)
-                .orElseThrow(() -> new RuntimeException("Ticket not found with id: " + ticketId));
+                .orElseThrow(() -> new RuntimeException(
+                        "Ticket not found with id: " + ticketId));
 
         long existing = attachmentRepository.countByTicketId(ticketId);
         if (existing + files.size() > 3) {
             throw new IllegalArgumentException(
-                "Maximum 3 attachments allowed. This ticket already has " + existing + " attachment(s).");
+                    "Maximum 3 attachments allowed. This ticket already has "
+                            + existing + " attachment(s).");
         }
 
         for (MultipartFile file : files) {
@@ -107,12 +108,16 @@ public class TicketService {
     }
 
     // ── READ ALL ──────────────────────────────────────────────────────────────
-    public List<TicketResponseDTO> getAllTickets(String status, String priority, String category) {
+    public List<TicketResponseDTO> getAllTickets(String status,
+                                                 String priority,
+                                                 String category) {
         List<Ticket> tickets;
         if (status != null) {
-            tickets = ticketRepository.findByStatus(Ticket.TicketStatus.valueOf(status));
+            tickets = ticketRepository.findByStatus(
+                    Ticket.TicketStatus.valueOf(status));
         } else if (priority != null) {
-            tickets = ticketRepository.findByPriority(Ticket.Priority.valueOf(priority));
+            tickets = ticketRepository.findByPriority(
+                    Ticket.Priority.valueOf(priority));
         } else if (category != null) {
             tickets = ticketRepository.findByCategory(category);
         } else {
@@ -122,33 +127,41 @@ public class TicketService {
     }
 
     // ── READ MY TICKETS ───────────────────────────────────────────────────────
-    public List<TicketResponseDTO> getMyTickets() {
-        return ticketRepository.findByReportedByUserId("testuser")
+    public List<TicketResponseDTO> getMyTickets(UserPrincipal userPrincipal) {
+        String userId = String.valueOf(userPrincipal.getId());
+        return ticketRepository.findByReportedByUserId(userId)
                 .stream().map(this::toResponseDTO).collect(Collectors.toList());
     }
 
     // ── READ SINGLE ───────────────────────────────────────────────────────────
     public TicketResponseDTO getTicketById(Long id) {
         Ticket ticket = ticketRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Ticket not found with id: " + id));
+                .orElseThrow(() -> new RuntimeException(
+                        "Ticket not found with id: " + id));
         return toResponseDTO(ticket);
     }
 
     // ── UPDATE STATUS ─────────────────────────────────────────────────────────
     public TicketResponseDTO updateTicketStatus(Long id, TicketStatusUpdateDTO dto) {
         Ticket ticket = ticketRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Ticket not found with id: " + id));
+                .orElseThrow(() -> new RuntimeException(
+                        "Ticket not found with id: " + id));
 
         Ticket.TicketStatus newStatus = Ticket.TicketStatus.valueOf(dto.getStatus());
         validateStatusTransition(ticket.getStatus(), newStatus);
 
         ticket.setStatus(newStatus);
 
-        if (dto.getResolutionNotes() != null) ticket.setResolutionNotes(dto.getResolutionNotes());
-        if (dto.getRejectionReason() != null) ticket.setRejectionReason(dto.getRejectionReason());
-        if (dto.getAssignedTechnicianId() != null) ticket.setAssignedTechnicianId(dto.getAssignedTechnicianId());
-        if (dto.getAssignedTechnicianName() != null) ticket.setAssignedTechnicianName(dto.getAssignedTechnicianName());
-        if (newStatus == Ticket.TicketStatus.RESOLVED) ticket.setResolvedAt(LocalDateTime.now());
+        if (dto.getResolutionNotes() != null)
+            ticket.setResolutionNotes(dto.getResolutionNotes());
+        if (dto.getRejectionReason() != null)
+            ticket.setRejectionReason(dto.getRejectionReason());
+        if (dto.getAssignedTechnicianId() != null)
+            ticket.setAssignedTechnicianId(dto.getAssignedTechnicianId());
+        if (dto.getAssignedTechnicianName() != null)
+            ticket.setAssignedTechnicianName(dto.getAssignedTechnicianName());
+        if (newStatus == Ticket.TicketStatus.RESOLVED)
+            ticket.setResolvedAt(LocalDateTime.now());
 
         return toResponseDTO(ticketRepository.save(ticket));
     }
@@ -156,7 +169,8 @@ public class TicketService {
     // ── DELETE ────────────────────────────────────────────────────────────────
     public void deleteTicket(Long id) {
         Ticket ticket = ticketRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Ticket not found with id: " + id));
+                .orElseThrow(() -> new RuntimeException(
+                        "Ticket not found with id: " + id));
         ticketRepository.delete(ticket);
     }
 
@@ -172,7 +186,8 @@ public class TicketService {
 
         String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
         Path filePath = uploadPath.resolve(fileName);
-        Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+        Files.copy(file.getInputStream(), filePath,
+                StandardCopyOption.REPLACE_EXISTING);
 
         TicketAttachment attachment = TicketAttachment.builder()
                 .ticket(ticket)
@@ -185,23 +200,34 @@ public class TicketService {
         attachmentRepository.save(attachment);
     }
 
-    private void validateStatusTransition(Ticket.TicketStatus current, Ticket.TicketStatus next) {
+    private void validateStatusTransition(Ticket.TicketStatus current,
+                                          Ticket.TicketStatus next) {
         boolean valid = switch (current) {
-            case OPEN -> next == Ticket.TicketStatus.IN_PROGRESS
-                      || next == Ticket.TicketStatus.REJECTED;
+            case OPEN        -> next == Ticket.TicketStatus.IN_PROGRESS
+                             || next == Ticket.TicketStatus.REJECTED;
             case IN_PROGRESS -> next == Ticket.TicketStatus.RESOLVED
                              || next == Ticket.TicketStatus.REJECTED;
-            case RESOLVED -> next == Ticket.TicketStatus.CLOSED;
-            default -> false;
+            case RESOLVED    -> next == Ticket.TicketStatus.CLOSED;
+            default          -> false;
         };
         if (!valid) throw new IllegalStateException(
                 "Invalid status transition from " + current + " to " + next);
     }
 
+    // ── TO RESPONSE DTO ───────────────────────────────────────────────────────
     private TicketResponseDTO toResponseDTO(Ticket ticket) {
-        List<String> urls = ticket.getAttachments().stream()
+        List<String> urls = attachmentRepository.findByTicketId(ticket.getId())
+                .stream()
                 .map(a -> "/api/tickets/attachments/" + a.getId())
                 .collect(Collectors.toList());
+
+        int commentCount = (int) commentRepository.countByTicketId(ticket.getId());
+
+        // Try to get reporter name from users table
+        String reporterName = userRepository
+                .findById(Long.parseLong(ticket.getReportedByUserId()))
+                .map(User::getName)
+                .orElse("Unknown");
 
         return TicketResponseDTO.builder()
                 .id(ticket.getId())
@@ -214,6 +240,7 @@ public class TicketService {
                 .resourceId(ticket.getResourceId())
                 .reportedByUserId(ticket.getReportedByUserId())
                 .reportedByEmail(ticket.getReportedByEmail())
+                .reportedByName(reporterName)
                 .preferredContact(ticket.getPreferredContact())
                 .assignedTechnicianId(ticket.getAssignedTechnicianId())
                 .assignedTechnicianName(ticket.getAssignedTechnicianName())
@@ -223,7 +250,7 @@ public class TicketService {
                 .updatedAt(ticket.getUpdatedAt())
                 .resolvedAt(ticket.getResolvedAt())
                 .attachmentUrls(urls)
-                .commentCount(ticket.getComments().size())
+                .commentCount(commentCount)
                 .build();
     }
 }
