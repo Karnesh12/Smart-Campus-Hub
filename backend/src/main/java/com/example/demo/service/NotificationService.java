@@ -20,11 +20,21 @@ public class NotificationService {
     private final SimpMessagingTemplate messagingTemplate;
     private final UserRepository userRepository;
 
-    public void notifyAdmins(String title, String content, Notification.NotificationType type) {
-        List<User> admins = userRepository.findByRole(User.Role.ADMIN);
-        for (User admin : admins) {
-            createNotification(admin, title, content, type);
+    public void notifyRoles(List<User.Role> roles, String title, String content, Notification.NotificationType type) {
+        for (User.Role role : roles) {
+            List<User> users = userRepository.findByRole(role);
+            for (User user : users) {
+                createNotification(user, title, content, type);
+            }
         }
+    }
+
+    public void notifyAdmins(String title, String content, Notification.NotificationType type) {
+        notifyRoles(List.of(User.Role.ADMIN), title, content, type);
+    }
+
+    public void notifyAdminsAndStaff(String title, String content, Notification.NotificationType type) {
+        notifyRoles(List.of(User.Role.ADMIN, User.Role.STAFF), title, content, type);
     }
 
     public Notification createNotification(User recipient, String title, String content, Notification.NotificationType type) {

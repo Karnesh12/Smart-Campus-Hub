@@ -65,7 +65,7 @@ public class TicketService {
 
         Ticket saved = ticketRepository.save(ticket);
 
-        notificationService.notifyAdmins(
+        notificationService.notifyAdminsAndStaff(
             "New Ticket Reported",
             user.getName() + " has reported an issue: " + ticket.getTitle(),
             Notification.NotificationType.TICKET_UPDATE
