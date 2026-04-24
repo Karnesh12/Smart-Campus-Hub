@@ -5,6 +5,7 @@ import LoginPage from './pages/LoginPage'
 import OAuth2RedirectHandler from './pages/OAuth2RedirectHandler'
 import Navbar from './components/Navbar'
 import ResourcesPage from './pages/ResourcesPage'
+import BookingsPage from './pages/BookingsPage'
 import { Toaster } from 'react-hot-toast'
 
 //  Layout with Navbar
@@ -20,6 +21,8 @@ function AppLayout() {
       <div className="main-content">
         <Routes>
           <Route path="/resources" element={<ResourcesPage />} />
+          <Route path="/bookings" element={<BookingsPage />} />
+          <Route path="*" element={<Navigate to="/resources" replace />} />
         </Routes>
       </div>
     </div>

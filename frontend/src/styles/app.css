@@ -1494,3 +1494,121 @@ tbody tr:hover td {
     right: 10%;
     animation-delay: 3s;
 }
+
+/* ── Booking: status tabs ────────────────────────────── */
+.status-tabs {
+    display: flex;
+    gap: 4px;
+    margin: 14px 0;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0;
+}
+
+.status-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-3);
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    transition: all .15s;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    margin-bottom: -1px;
+}
+
+.status-tab:hover {
+    color: var(--text-2);
+}
+
+.status-tab.active {
+    color: var(--blue);
+    border-bottom-color: var(--blue);
+    font-weight: 600;
+}
+
+.status-tab-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    border-radius: 9px;
+    font-size: 11px;
+    font-weight: 700;
+    background: var(--bg-2);
+    color: var(--text-3);
+}
+
+.status-tab.active .status-tab-count {
+    background: #eef1fe;
+    color: var(--blue);
+}
+
+/* ── Booking: detail modal rows ──────────────────────── */
+.booking-detail-resource {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    background: var(--bg);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    margin-bottom: 18px;
+}
+
+.booking-detail-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    font-size: 13.5px;
+}
+
+.booking-detail-label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    width: 130px;
+    flex-shrink: 0;
+    color: var(--text-3);
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    padding-top: 1px;
+}
+
+.booking-detail-value {
+    color: var(--text);
+    flex: 1;
+    line-height: 1.5;
+}
+
+.booking-reject-reason {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 10px 12px;
+    background: var(--red-l);
+    border: 1px solid #fca5a5;
+    border-radius: var(--radius);
+    font-size: 13px;
+    color: var(--red);
+    line-height: 1.5;
+}
+
+/* ── Booking: form error ─────────────────────────────── */
+.booking-form-error {
+    padding: 10px 13px;
+    background: var(--red-l);
+    border: 1px solid #fca5a5;
+    border-radius: var(--radius);
+    font-size: 13px;
+    color: var(--red);
+    margin-bottom: 8px;
+}
