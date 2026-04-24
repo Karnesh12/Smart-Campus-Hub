@@ -7,6 +7,7 @@ import Navbar from './components/Navbar'
 import ResourcesPage from './pages/ResourcesPage'
 import BookingsPage from './pages/BookingsPage'
 import NotificationsPage from './pages/NotificationsPage'
+import DashboardPage from './pages/DashboardPage'
 import { NotificationProvider } from './context/NotificationContext'
 
 // Member 3 — Incident Tickets
@@ -33,12 +34,7 @@ function AppLayout() {
           <Route path="/bookings" element={<BookingsPage />} />
 
           {/* Dashboard */}
-          <Route path="/dashboard" element={
-            <div style={{ padding: '40px', textAlign: 'center' }}>
-              <h1>Dashboard</h1>
-              <p>Welcome to Smart Campus!</p>
-            </div>
-          } />
+          <Route path="/dashboard" element={<DashboardPage />} />
 
           {/* Notifications */}
           <Route path="/notifications" element={<NotificationsPage />} />
