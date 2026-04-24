@@ -3,6 +3,8 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import api from '../services/api'
 
+const API_BASE = 'http://localhost:8082';
+
 export default function OAuth2RedirectHandler() {
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
