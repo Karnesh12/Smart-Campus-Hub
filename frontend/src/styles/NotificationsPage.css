@@ -1,0 +1,181 @@
+.notifications-page {
+  max-width: 800px;
+  margin: 40px auto;
+  padding: 0 20px;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+}
+
+.header-title {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.header-icon {
+  color: #3b82f6;
+  width: 32px;
+  height: 32px;
+}
+
+.header-title h1 {
+  margin: 0;
+  font-size: 28px;
+  color: #111;
+  font-weight: 700;
+}
+
+.unread-count {
+  background-color: #dbeafe;
+  color: #1e40af;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+
+.mark-read-all-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: white;
+  border: 1px solid #e5e7eb;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #4b5563;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.mark-read-all-btn:hover {
+  background-color: #f9fafb;
+  border-color: #d1d5db;
+  color: #111;
+}
+
+.notifications-container {
+  background-color: #f9fafb;
+  border-radius: 16px;
+  padding: 24px;
+  min-height: 400px;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 0;
+  color: #9ca3af;
+}
+
+.empty-icon {
+  margin-bottom: 16px;
+  opacity: 0.5;
+}
+
+.notifications-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.notification-card {
+  background-color: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  display: flex;
+  overflow: hidden;
+  position: relative;
+  transition: transform 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+}
+
+.notification-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.notification-card.unread {
+  border-color: #bfdbfe;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
+}
+
+.card-indicator {
+  width: 4px;
+  background-color: #e5e7eb;
+}
+
+.notification-card.unread .card-indicator {
+  background-color: #3b82f6;
+}
+
+.card-content {
+  flex: 1;
+  padding: 20px;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.notification-type-tag {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 4px;
+  letter-spacing: 0.5px;
+}
+
+.notification-type-tag.booking_status { background-color: #fef3c7; color: #92400e; }
+.notification-type-tag.ticket_update { background-color: #dcfce7; color: #166534; }
+.notification-type-tag.system_alert { background-color: #fee2e2; color: #991b1b; }
+
+.card-time {
+  font-size: 12px;
+  color: #9ca3af;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.card-title {
+  margin: 0 0 8px 0;
+  font-size: 18px;
+  color: #111;
+}
+
+.card-message {
+  margin: 0;
+  color: #4b5563;
+  line-height: 1.5;
+  font-size: 15px;
+}
+
+.individual-read-btn {
+  background: none;
+  border: none;
+  color: #3b82f6;
+  padding: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s;
+}
+
+.individual-read-btn:hover {
+  color: #2563eb;
+  background-color: #f0f7ff;
+}

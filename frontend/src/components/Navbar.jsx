@@ -2,9 +2,11 @@ import React from 'react'
 import { NavLink } from 'react-router-dom'
 import { LayoutDashboard, Building2, CalendarCheck, Ticket, Bell, LogOut } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
+import { useNotifications } from '../context/NotificationContext'
 
 export default function Navbar() {
     const { user, logout } = useAuth()
+    const { unreadCount } = useNotifications()
     const initials = user?.name
         ? user.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()
         : '?'
@@ -24,7 +26,7 @@ export default function Navbar() {
                     <Building2 size={17} color="#fff" />
                 </div>
                 <div>
-                    <div className="sidebar-logo-text">Smart Campus by Krishan Explains</div>
+                    <div className="sidebar-logo-text">Smart Campus Hub</div>
                     <div className="sidebar-logo-sub">Management</div>
                 </div>
             </div>
@@ -33,8 +35,13 @@ export default function Navbar() {
                 <div className="nav-section">Menu</div>
                 {links.map(({ to, icon: Icon, label }) => (
                     <NavLink key={to} to={to} className={({ isActive }) => isActive ? 'active' : ''}>
-                        <Icon size={16} />
-                        <span className="nav-label">{label}</span>
+                        <div className="nav-link-content">
+                            <Icon size={16} />
+                            <span className="nav-label">{label}</span>
+                        </div>
+                        {label === 'Notifications' && unreadCount > 0 && (
+                            <span className="sidebar-badge">{unreadCount}</span>
+                        )}
                     </NavLink>
                 ))}
             </nav>

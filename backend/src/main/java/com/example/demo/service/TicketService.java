@@ -11,6 +11,7 @@ import com.example.demo.repository.TicketCommentRepository;
 import com.example.demo.repository.TicketRepository;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.security.UserPrincipal;
+import com.example.demo.model.Notification;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
@@ -36,6 +37,7 @@ public class TicketService {
     private final TicketAttachmentRepository attachmentRepository;
     private final TicketCommentRepository commentRepository;
     private final UserRepository userRepository;
+    private final NotificationService notificationService;
 
     @Value("${file.upload-dir:uploads/tickets}")
     private String uploadDir;
@@ -163,7 +165,21 @@ public class TicketService {
         if (newStatus == Ticket.TicketStatus.RESOLVED)
             ticket.setResolvedAt(LocalDateTime.now());
 
-        return toResponseDTO(ticketRepository.save(ticket));
+        Ticket saved = ticketRepository.save(ticket);
+
+        // Notify reporter
+        User reporter = userRepository.findById(Long.parseLong(saved.getReportedByUserId()))
+                .orElse(null);
+        if (reporter != null) {
+            notificationService.createNotification(
+                reporter,
+                "Ticket Status Updated",
+                "Your ticket '" + saved.getTitle() + "' is now " + saved.getStatus(),
+                Notification.NotificationType.TICKET_UPDATE
+            );
+        }
+
+        return toResponseDTO(saved);
     }
 
     // ── DELETE ────────────────────────────────────────────────────────────────

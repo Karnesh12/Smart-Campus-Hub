@@ -78,9 +78,8 @@ export default function TicketListPage() {
 
   return (
     <div>
-      <div className="page-header">
-        <div className="page-header-row">
-          <div>
+      <div className="page-header page-header-row">
+        <div>
             <h1>Incident <span>Tickets</span></h1>
             <p>Manage maintenance and incident reports across campus</p>
           </div>
@@ -90,7 +89,6 @@ export default function TicketListPage() {
             </svg>
             New Ticket
           </button>
-        </div>
       </div>
 
       <div className="stats-grid" style={{ gridTemplateColumns: 'repeat(5, 1fr)', marginBottom: 20 }}>

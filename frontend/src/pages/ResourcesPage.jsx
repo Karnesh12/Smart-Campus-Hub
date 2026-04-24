@@ -66,7 +66,7 @@ export default function ResourcesPage() {
         <div>
             <div className="page-header page-header-row">
                 <div>
-                    <h1>Campus Resources</h1>
+                    <h1>Campus <span>Resources</span></h1>
                     <p>Manage all campus facilities and assets</p>
                 </div>
                 {canManage && (

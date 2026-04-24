@@ -2,6 +2,7 @@ package com.example.demo.repository;
 
 import com.example.demo.model.Booking;
 import com.example.demo.model.Booking.BookingStatus;
+import com.example.demo.model.Resource;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -34,4 +35,6 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
         @Param("endTime") LocalTime endTime,
         @Param("statuses") List<BookingStatus> statuses
     );
+
+    void deleteByResource(Resource resource);
 }

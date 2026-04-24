@@ -6,6 +6,7 @@ import com.example.demo.model.Booking.BookingStatus;
 import com.example.demo.model.Resource.ResourceStatus;
 import com.example.demo.model.User.Role;
 import com.example.demo.repository.*;
+import com.example.demo.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +21,7 @@ public class BookingService {
     private final BookingRepository bookingRepository;
     private final ResourceRepository resourceRepository;
     private final UserRepository userRepository;
+    private final NotificationService notificationService;
 
     public Booking createBooking(Long userId, BookingRequest request) {
         Resource resource = resourceRepository.findById(request.getResourceId())
@@ -77,7 +79,16 @@ public class BookingService {
         }
 
         booking.setStatus(BookingStatus.APPROVED);
-        return bookingRepository.save(booking);
+        Booking saved = bookingRepository.save(booking);
+
+        notificationService.createNotification(
+            booking.getUser(),
+            "Booking Approved",
+            "Your booking for " + booking.getResource().getName() + " has been approved.",
+            Notification.NotificationType.BOOKING_STATUS
+        );
+
+        return saved;
     }
 
     public Booking rejectBooking(Long bookingId, String reason) {
@@ -90,7 +101,16 @@ public class BookingService {
 
         booking.setStatus(BookingStatus.REJECTED);
         booking.setRejectionReason(reason);
-        return bookingRepository.save(booking);
+        Booking saved = bookingRepository.save(booking);
+
+        notificationService.createNotification(
+            booking.getUser(),
+            "Booking Rejected",
+            "Your booking for " + booking.getResource().getName() + " was rejected. Reason: " + reason,
+            Notification.NotificationType.BOOKING_STATUS
+        );
+
+        return saved;
     }
 
     public Booking cancelBooking(Long bookingId, Long userId, Role userRole) {

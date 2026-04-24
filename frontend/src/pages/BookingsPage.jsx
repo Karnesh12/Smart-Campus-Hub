@@ -139,7 +139,7 @@ export default function BookingsPage() {
             {/* Page header */}
             <div className="page-header page-header-row">
                 <div>
-                    <h1>{canManageAll ? 'All Bookings' : 'My Bookings'}</h1>
+                    <h1>{canManageAll ? <>All <span>Bookings</span></> : <>My <span>Bookings</span></>}</h1>
                     <p>{canManageAll ? 'Review and manage all booking requests' : 'View and manage your resource bookings'}</p>
                 </div>
                 <button className="btn btn-primary" onClick={() => setShowForm(true)}>

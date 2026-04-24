@@ -4,6 +4,7 @@ import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.model.Resource;
 import com.example.demo.model.Resource.ResourceStatus;
 import com.example.demo.model.Resource.ResourceType;
+import com.example.demo.repository.BookingRepository;
 import com.example.demo.repository.ResourceRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,7 @@ import java.util.List;
 public class ResourceService {
 
     private final ResourceRepository resourceRepository;
+    private final BookingRepository bookingRepository;
 
     public List<Resource> getAllResources() {
         return resourceRepository.findAll();
@@ -63,6 +65,8 @@ public class ResourceService {
 
     public void deleteResource(Long id) {
         Resource resource = getResourceById(id);
+        // Manually delete bookings first to ensure FK constraint is satisfied
+        bookingRepository.deleteByResource(resource);
         resourceRepository.delete(resource);
     }
 }
