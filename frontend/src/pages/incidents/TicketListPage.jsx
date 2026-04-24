@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Ticket, Mail, Settings, CheckCircle, AlertCircle, MessageSquare, Search, RefreshCw, Eye, Trash2, Plus } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { getAllTickets, getMyTickets, deleteTicket } from '../../services/ticketService';
 
@@ -84,23 +85,21 @@ export default function TicketListPage() {
             <p>Manage maintenance and incident reports across campus</p>
           </div>
           <button className="btn btn-primary" onClick={() => navigate('/tickets/create')}>
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-              <path d="M12 5v14M5 12h14"/>
-            </svg>
+            <Plus size={15} />
             New Ticket
           </button>
       </div>
 
       <div className="stats-grid" style={{ gridTemplateColumns: 'repeat(5, 1fr)', marginBottom: 20 }}>
         {[
-          { label: 'Total',       value: tickets.length,                                        color: 'blue',   icon: '🎫' },
-          { label: 'Open',        value: tickets.filter(t => t.status === 'OPEN').length,        color: 'blue',   icon: '📬' },
-          { label: 'In Progress', value: tickets.filter(t => t.status === 'IN_PROGRESS').length, color: 'yellow', icon: '⚙️' },
-          { label: 'Resolved',    value: tickets.filter(t => t.status === 'RESOLVED').length,    color: 'green',  icon: '✅' },
-          { label: 'Critical',    value: tickets.filter(t => t.priority === 'CRITICAL').length,  color: 'red',    icon: '🚨' },
+          { label: 'Total',       value: tickets.length,                                        color: 'blue',   icon: <Ticket size={20} /> },
+          { label: 'Open',        value: tickets.filter(t => t.status === 'OPEN').length,        color: 'blue',   icon: <Mail size={20} /> },
+          { label: 'In Progress', value: tickets.filter(t => t.status === 'IN_PROGRESS').length, color: 'yellow', icon: <Settings size={20} /> },
+          { label: 'Resolved',    value: tickets.filter(t => t.status === 'RESOLVED').length,    color: 'green',  icon: <CheckCircle size={20} /> },
+          { label: 'Critical',    value: tickets.filter(t => t.priority === 'CRITICAL').length,  color: 'red',    icon: <AlertCircle size={20} /> },
         ].map((s) => (
           <div className="stat-card" key={s.label}>
-            <div className={`stat-icon ${s.color}`} style={{ fontSize: 20 }}>{s.icon}</div>
+            <div className={`stat-icon ${s.color}`}>{s.icon}</div>
             <div className="stat-info">
               <div className="stat-value">{s.value}</div>
               <div className="stat-label">{s.label}</div>
@@ -133,9 +132,7 @@ export default function TicketListPage() {
           )}
 
           <div className="search-box">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-            </svg>
+            <Search size={14} />
             <input
               placeholder="Search tickets..."
               value={search}
@@ -167,12 +164,7 @@ export default function TicketListPage() {
           )}
 
           <button className="btn btn-secondary btn-sm" onClick={fetchTickets} style={{ marginLeft: 'auto' }}>
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-              <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
-              <path d="M3 3v5h5"/>
-              <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/>
-              <path d="M16 16h5v5"/>
-            </svg>
+            <RefreshCw size={13} />
             Refresh
           </button>
         </div>
@@ -183,9 +175,7 @@ export default function TicketListPage() {
           <div style={{ color: 'var(--red)', padding: 24, textAlign: 'center' }}>{error}</div>
         ) : filtered.length === 0 ? (
           <div className="empty-state">
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-              <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-            </svg>
+            <AlertCircle size={48} />
             <h3>No tickets found</h3>
             <p>Create a new ticket to get started</p>
           </div>
@@ -213,8 +203,8 @@ export default function TicketListPage() {
                         {t.title}
                       </div>
                       {t.commentCount > 0 && (
-                        <div style={{ fontSize: 11, color: 'var(--text-3)', marginTop: 2 }}>
-                          💬 {t.commentCount} comment{t.commentCount > 1 ? 's' : ''}
+                        <div style={{ fontSize: 11, color: 'var(--text-3)', marginTop: 2, display: 'flex', alignItems: 'center', gap: 4 }}>
+                          <MessageSquare size={10} /> {t.commentCount} comment{t.commentCount > 1 ? 's' : ''}
                         </div>
                       )}
                     </td>
@@ -229,17 +219,12 @@ export default function TicketListPage() {
                       <div style={{ display: 'flex', gap: 6 }} onClick={(e) => e.stopPropagation()}>
                         <button className="btn btn-secondary btn-sm btn-icon" title="View"
                           onClick={() => navigate(`/tickets/${t.id}`)}>
-                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
-                          </svg>
+                          <Eye size={13} />
                         </button>
                         {isAdminOrStaff && (
                           <button className="btn btn-danger btn-sm btn-icon" title="Delete"
                             onClick={(e) => handleDelete(t.id, e)}>
-                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                              <polyline points="3 6 5 6 21 6"/>
-                              <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a1 1 0 011-1h4a1 1 0 011 1v2"/>
-                            </svg>
+                            <Trash2 size={13} />
                           </button>
                         )}
                       </div>
