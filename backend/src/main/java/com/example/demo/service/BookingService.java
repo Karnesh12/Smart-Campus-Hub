@@ -67,7 +67,15 @@ public class BookingService {
             .status(BookingStatus.PENDING)
             .build();
 
-        return bookingRepository.save(booking);
+        Booking saved = bookingRepository.save(booking);
+
+        notificationService.notifyAdmins(
+            "New Booking Request",
+            user.getName() + " has requested to book " + resource.getName() + " on " + request.getBookingDate(),
+            Notification.NotificationType.BOOKING_STATUS
+        );
+
+        return saved;
     }
 
     public Booking approveBooking(Long bookingId) {

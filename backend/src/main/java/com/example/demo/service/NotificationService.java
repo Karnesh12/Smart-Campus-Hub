@@ -3,6 +3,7 @@ package com.example.demo.service;
 import com.example.demo.model.Notification;
 import com.example.demo.model.User;
 import com.example.demo.repository.NotificationRepository;
+import com.example.demo.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,14 @@ public class NotificationService {
 
     private final NotificationRepository notificationRepository;
     private final SimpMessagingTemplate messagingTemplate;
+    private final UserRepository userRepository;
+
+    public void notifyAdmins(String title, String content, Notification.NotificationType type) {
+        List<User> admins = userRepository.findByRole(User.Role.ADMIN);
+        for (User admin : admins) {
+            createNotification(admin, title, content, type);
+        }
+    }
 
     public Notification createNotification(User recipient, String title, String content, Notification.NotificationType type) {
         Notification notification = Notification.builder()
