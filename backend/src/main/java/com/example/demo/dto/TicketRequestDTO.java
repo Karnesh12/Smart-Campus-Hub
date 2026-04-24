@@ -17,7 +17,7 @@ public class TicketRequestDTO {
     private String category;
 
     @NotNull(message = "Priority is required")
-    private String priority; // LOW, MEDIUM, HIGH, CRITICAL
+    private String priority;
 
     @NotBlank(message = "Resource location is required")
     private String resourceLocation;

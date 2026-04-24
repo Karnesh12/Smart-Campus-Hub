@@ -3,6 +3,8 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
 
+const API_BASE = 'http://localhost:8082';
+
 export default function OAuth2RedirectHandler() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -14,32 +16,26 @@ export default function OAuth2RedirectHandler() {
     const urlError = searchParams.get('error');
 
     if (token) {
-      // Save token and configure Axios
+      // Save token
       localStorage.setItem('jwt_token', token);
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
-      // Fetch user profile from the backend
-      axios.get('/api/auth/me')
+      // Fetch user profile — use FULL URL
+      axios.get(`${API_BASE}/api/auth/me`)
         .then(response => {
           login(response.data);
           navigate('/dashboard', { replace: true });
         })
         .catch(err => {
-          console.error('Failed to fetch user profile after OAuth login:', err);
-          setError('Failed to fetch user profile. Please try logging in again.');
-          // Clean up token just in case
+          console.error('Failed to fetch user profile:', err);
+          setError('Failed to fetch user profile. Please try again.');
           localStorage.removeItem('jwt_token');
           delete axios.defaults.headers.common['Authorization'];
-          
-          setTimeout(() => {
-            navigate('/login', { replace: true });
-          }, 3000);
+          setTimeout(() => navigate('/login', { replace: true }), 3000);
         });
     } else {
       setError(urlError || 'Authentication failed. No token received.');
-      setTimeout(() => {
-        navigate('/login', { replace: true });
-      }, 3000);
+      setTimeout(() => navigate('/login', { replace: true }), 3000);
     }
   }, [searchParams, navigate, login]);
 

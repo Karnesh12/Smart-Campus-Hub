@@ -1,7 +1,7 @@
 package com.example.demo.dto;
 
-import lombok.Data;
 import lombok.Builder;
+import lombok.Data;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -19,6 +19,7 @@ public class TicketResponseDTO {
     private String resourceId;
     private String reportedByUserId;
     private String reportedByEmail;
+    private String reportedByName;
     private String preferredContact;
     private String assignedTechnicianId;
     private String assignedTechnicianName;

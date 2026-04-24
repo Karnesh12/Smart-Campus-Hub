@@ -10,4 +10,5 @@ import java.util.List;
 public interface TicketCommentRepository extends JpaRepository<TicketComment, Long> {
     List<TicketComment> findByTicketIdOrderByCreatedAtAsc(Long ticketId);
     List<TicketComment> findByAuthorId(String authorId);
+    long countByTicketId(Long ticketId); // ← this was missing
 }
