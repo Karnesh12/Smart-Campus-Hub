@@ -58,7 +58,6 @@ public class ResourceService {
 
             resource.setStatus(ResourceStatus.OCCUPIED);
 
-            // 🔥 ADD THIS PART (this was missing before)
             resource.setOccupiedFrom(
                     today.atTime(current.getStartTime()));
             resource.setOccupiedUntil(
