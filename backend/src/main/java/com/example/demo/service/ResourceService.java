@@ -33,10 +33,11 @@ public class ResourceService {
     }
 
     /**
-     * Dynamically updates the resource status to OCCUPIED if there is an 
+     * Dynamically updates the resource status to OCCUPIED if there is an
      * approved booking active RIGHT NOW.
      */
     private void updateCurrentStatus(Resource resource) {
+
         // If it's already in maintenance or retired, don't override that
         if (resource.getStatus() == ResourceStatus.MAINTENANCE || resource.getStatus() == ResourceStatus.RETIRED) {
             return;
@@ -45,21 +46,29 @@ public class ResourceService {
         java.time.LocalDate today = java.time.LocalDate.now();
         java.time.LocalTime now = java.time.LocalTime.now();
 
-        // Check if any approved booking is active right now
-        boolean isCurrentlyBooked = bookingRepository.findConflicting(
-            resource.getId(),
-            today,
-            now,
-            now.plusMinutes(1), // Check if current minute is within a booking range
-            List.of(com.example.demo.model.Booking.BookingStatus.APPROVED)
-        ).size() > 0;
+        List<com.example.demo.model.Booking> bookings = bookingRepository.findConflicting(
+                resource.getId(),
+                today,
+                now,
+                now.plusMinutes(1),
+                List.of(com.example.demo.model.Booking.BookingStatus.APPROVED));
 
-        if (isCurrentlyBooked) {
+        if (!bookings.isEmpty()) {
+            com.example.demo.model.Booking current = bookings.get(0);
+
             resource.setStatus(ResourceStatus.OCCUPIED);
+
+            resource.setOccupiedFrom(
+                    today.atTime(current.getStartTime()));
+            resource.setOccupiedUntil(
+                    today.atTime(current.getEndTime()));
+
         } else {
-            // If no active booking, ensure it shows as AVAILABLE (unless manually set otherwise)
-            // Note: We don't save this to DB here, it's just for the response.
             resource.setStatus(ResourceStatus.AVAILABLE);
+
+            // clear old values
+            resource.setOccupiedFrom(null);
+            resource.setOccupiedUntil(null);
         }
     }
 
