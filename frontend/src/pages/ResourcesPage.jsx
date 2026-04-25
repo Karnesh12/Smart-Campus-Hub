@@ -16,6 +16,7 @@ export default function ResourcesPage() {
     const [loading, setLoading] = useState(true)
     const [search, setSearch] = useState('')
     const [typeFilter, setTypeFilter] = useState('')
+    const [statusFilter, setStatusFilter] = useState('')
     const [showModal, setShowModal] = useState(false)
     const [editing, setEditing] = useState(null)
     const [deleteId, setDeleteId] = useState(null)
@@ -36,8 +37,9 @@ export default function ResourcesPage() {
         let list = resources
         if (search) list = list.filter(r => r.name.toLowerCase().includes(search.toLowerCase()))
         if (typeFilter) list = list.filter(r => r.type === typeFilter)
+        if (statusFilter) list = list.filter(r => r.status === statusFilter)
         setFiltered(list)
-    }, [search, typeFilter, resources])
+    }, [search, typeFilter, statusFilter, resources])
 
     const handleSubmit = async (data) => {
         try {
@@ -84,6 +86,17 @@ export default function ResourcesPage() {
                 <select className="filter-select" value={typeFilter} onChange={e => setTypeFilter(e.target.value)}>
                     <option value="">All Types</option>
                     {TYPES.map(t => <option key={t} value={t}>{t.replace(/_/g, ' ')}</option>)}
+                </select>
+                <select
+                    className="filter-select"
+                    value={statusFilter}
+                    onChange={e => setStatusFilter(e.target.value)}
+                >
+                    <option value="">All Status</option>
+                    <option value="AVAILABLE">Available</option>
+                    <option value="OCCUPIED">Occupied</option>
+                    <option value="MAINTENANCE">Maintenance</option>
+                    <option value="RETIRED">Retired</option>
                 </select>
                 <span style={{ marginLeft: 'auto', fontSize: 12, color: 'var(--text-3)' }}>
                     {filtered.length} resource{filtered.length !== 1 ? 's' : ''}
