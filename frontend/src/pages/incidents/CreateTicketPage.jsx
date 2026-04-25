@@ -58,7 +58,7 @@ export default function CreateTicketPage() {
       {/* Header */}
       <div className="page-header">
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 6 }}>
-          <button className="btn btn-secondary btn-sm" onClick={() => navigate('/incidents')}>
+          <button className="btn btn-secondary btn-sm" onClick={() => navigate('/tickets')}>
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
               <path d="M19 12H5m7-7-7 7 7 7"/>
             </svg>
