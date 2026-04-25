@@ -48,8 +48,8 @@ export default function TicketDetailPage() {
   const [uploadFiles, setUploadFiles]   = useState([]);
   const [uploadLoading, setUploadLoading] = useState(false);
 
-  // CORRECT:
-  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  // ── FIXED: use AuthContext instead of wrong localStorage key ──
+  const { user } = useAuth();
   const isAdminOrStaff = user?.role === 'ADMIN' || user?.role === 'STAFF';
 
   const fetchAll = async () => {
@@ -316,7 +316,6 @@ export default function TicketDetailPage() {
                         <span style={{ fontSize: 11, color: 'var(--text-3)' }}>
                           {new Date(c.createdAt).toLocaleString()}
                         </span>
-                        {/* Edit/Delete — own comment or admin */}
                         {(String(c.authorId) === String(user?.id) || isAdminOrStaff) && (
                           <>
                             {String(c.authorId) === String(user?.id) && (
