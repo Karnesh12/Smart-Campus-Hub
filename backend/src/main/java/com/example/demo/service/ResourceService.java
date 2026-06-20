@@ -32,6 +32,14 @@ public class ResourceService {
         return resource;
     }
 
+    public List<Resource> getResourcesByStatus(ResourceStatus status) {
+        return resourceRepository.findByStatus(status);
+    }
+
+    public List<Resource> getResourcesByStatusAndType(ResourceStatus status, ResourceType type) {
+        return resourceRepository.findByStatusAndType(status, type);
+    }
+
     /**
      * Dynamically updates the resource status to OCCUPIED if there is an
      * approved booking active RIGHT NOW.
